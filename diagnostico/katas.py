@@ -8,6 +8,7 @@ manejo de errores, dataclasses y context managers. No requiere librerías extern
 
 from __future__ import annotations
 
+import re
 from collections.abc import Callable, Iterable, Iterator
 from dataclasses import dataclass
 
@@ -15,13 +16,46 @@ from dataclasses import dataclass
 # 1. Comprensiones -----------------------------------------------------------
 def palabras_por_longitud(texto: str) -> dict[int, list[str]]:
     """Agrupa palabras únicas (minúsculas, sin puntuación) por longitud, ordenadas."""
-    raise NotImplementedError
+
+    texto = texto.lower()
+    texto = re.sub(r"[^\w\s]", "", texto)
+    palabras = set(texto.split())
+    resultado = {}
+
+    for palabra in palabras:
+        longitud = len(palabra)
+
+        if longitud not in resultado:
+            resultado[longitud] = []
+
+        resultado[longitud].append(palabra)
+
+    for longitud in resultado:
+        resultado[longitud].sort()
+
+    resultado = dict(sorted(resultado.items()))
+
+    return resultado
 
 
 # 2. Colecciones -------------------------------------------------------------
 def top_n(frecuencias: Iterable[str], n: int) -> list[tuple[str, int]]:
     """Los n elementos más frecuentes; empate → orden alfabético."""
-    raise NotImplementedError
+    conteo = {}
+    resultado = []
+
+    for palabra in frecuencias:
+        if palabra in conteo:
+            conteo[palabra] += 1
+        else:
+            conteo[palabra] = 1
+
+    for palabra in conteo:
+        resultado.append((palabra, conteo[palabra]))
+
+    resultado.sort()
+
+    return resultado[:n]
 
 
 # 3. Funciones de orden superior / closures ----------------------------------
